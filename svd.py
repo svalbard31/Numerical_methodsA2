@@ -10,9 +10,9 @@ def svd(image):
     u, s, v = np.linalg.svd(image) #SVD decomposition
     return u, s, v
 
-def truncate(u,s,v,k):
+def truncate(u,s,v,k):sd
     u_k=u[:,:k] #Take the first k columns of u
-    s_k=np.diag(s[:k]) #Take the first k singular values and make a diagonal matrix
+    s_k=np.diag(s[:k]) #Takgie the first k singular values and make a diagonal matrix
     v_k=v[:k,:] #Take the first k rows of v 
     return u_k, s_k, v_k
 
