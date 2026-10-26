@@ -12,7 +12,7 @@ def svd(image):
 
 def truncate(u,s,v,k):
     u_k=u[:,:k] #Take the first k columns of u
-    s_k=np.diag(s[:k]) #Takgie the first k singular values and make a diagonal matrix
+    s_k=np.diag(s[:k]) #Take the first k singular values and make a diagonal matrix
     v_k=v[:k,:] #Take the first k rows of v 
     return u_k, s_k, v_k
 
@@ -77,6 +77,35 @@ print("Error at k=5: ", frobenius_norm(grey-create_img(*truncate(*svd(grey), 5))
 print("Error at k=15: ", frobenius_norm(grey-create_img(*truncate(*svd(grey), 15)))/frobenius_norm(grey))
 print("Error at k=50: ", frobenius_norm(grey-create_img(*truncate(*svd(grey), 50)))/frobenius_norm(grey))
 print("Error at k=200: ", frobenius_norm(grey-create_img(*truncate(*svd(grey), 200)))/frobenius_norm(grey))
+
+sum_sigma=0
+u,s,v=svd(grey)
+for i in range(50, min(grey.shape)):
+    sum_sigma+=s[i]**2
+
+
+print("Verifying numerically: ", frobenius_norm(grey-create_img(*truncate(*svd(grey), 50)))**2,"=", sum_sigma)
+
+
+p,q=grey.shape
+
+print("The original image stores ", p*q, " numbers.")
+print("At k=5 we store ",5*(p+q+1), "numbers. The ratio of storage is ", 5*(p+q+1)/(p*q)*100,"%")
+print("At k=15 we store ",15*(p+q+1), "numbers. The ratio of storage is ", 15*(p+q+1)/(p*q)*100,"%")
+print("At k=50 we store ",50*(p+q+1), "numbers. The ratio of storage is ", 50*(p+q+1)/(p*q)*100,"%")
+print("At k=200 we store ",200*(p+q+1), "numbers. The ratio of storage is ", 200*(p+q+1)/(p*q)*100,"%")
+
+
+
+def retained_frobenius(s, k):
+    return np.sum(s[:k]**2)/np.sum(s**2)
+
+print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, 1)*100:.2f}%")
+print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, 2)*100:.2f}%")
+print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, 7)*100:.2f}%")
+print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, 8)*100:.2f}%")
+print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, 91)*100:.2f}%")
+print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, 92)*100:.2f}%")
 
 
 
