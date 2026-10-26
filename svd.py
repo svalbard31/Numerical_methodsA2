@@ -10,7 +10,7 @@ def svd(image):
     u, s, v = np.linalg.svd(image) #SVD decomposition
     return u, s, v
 
-def truncate(u,s,v,k):sd
+def truncate(u,s,v,k):
     u_k=u[:,:k] #Take the first k columns of u
     s_k=np.diag(s[:k]) #Takgie the first k singular values and make a diagonal matrix
     v_k=v[:k,:] #Take the first k rows of v 
@@ -77,6 +77,8 @@ print("Error at k=5: ", frobenius_norm(grey-create_img(*truncate(*svd(grey), 5))
 print("Error at k=15: ", frobenius_norm(grey-create_img(*truncate(*svd(grey), 15)))/frobenius_norm(grey))
 print("Error at k=50: ", frobenius_norm(grey-create_img(*truncate(*svd(grey), 50)))/frobenius_norm(grey))
 print("Error at k=200: ", frobenius_norm(grey-create_img(*truncate(*svd(grey), 200)))/frobenius_norm(grey))
+
+
 
 
 plt.show()
