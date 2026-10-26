@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 
 
 
-img = cv2.imread("figures/sunset.png") #Read image
+img = cv2.imread("image0.jpg") #Read image
 grey = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)/255 #Turn it from [0,255] to [0,1] and into grayscale
 
 def svd(image):
@@ -103,13 +103,15 @@ def retained_frobenius(s, k):
     return np.sum(s[:k]**2)/np.sum(s**2)
 
 for i in range(1,1000,1):
-    if (retained_frobenius(s, i)-0.90)<0.1 and (retained_frobenius(s, i)-0.90)>0:
+    if (retained_frobenius(s, i)-0.90)<0.01 and (retained_frobenius(s, i)-0.90)>0:
         print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, i)*100:.2f}%")
-    elif (retained_frobenius(s, i)-0.95)<0.1 and (retained_frobenius(s, i)-0.95)>0:
+    elif (retained_frobenius(s, i)-0.95)<0.01 and (retained_frobenius(s, i)-0.95)>0:
         print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, i)*100:.2f}%")
     elif (retained_frobenius(s, i)-0.99)<0.01 and (retained_frobenius(s, i)-0.99)>0:
         print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, i)*100:.2f}%")
-print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, i)*100:.2f}%")
+        break
+        
+#print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, i)*100:.2f}%")
 
 
 
@@ -120,7 +122,56 @@ print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, i)*100:.2f}%")
 #print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, 91)*100:.2f}%")
 #print(f"Retained Frobenius norm at k={i}: {retained_frobenius(s, 92)*100:.2f}%")
 
+#SVD Denoising
+
+np.random.seed(3572736) #Set the random seed for reproducibility
+rand_matrix = np.random.random(grey.shape) #Create a random matrix of the same shape as the image
+noisy_image = grey + 0.9*rand_matrix #Add noise to the image
+
+fig4 = plt.figure(figsize=(10, 8))
+plt.subplot(3,2,1)
+plt.imshow(noisy_image, cmap='gray', interpolation='antialiased')
+plt.title("Noisy image")
+
+plt.subplot(3,2,2)
+plt.imshow(grey, cmap='gray', interpolation='antialiased')
+plt.title("Original image")
+
+svd_noisy = svd(noisy_image)
+plt.subplot(3,2,3)
+plt.imshow(create_img(*truncate(*svd_noisy, 5)), cmap='gray', interpolation='antialiased')
+plt.title("k=5")
 
 
+plt.subplot(3,2,4)
+plt.imshow(create_img(*truncate(*svd_noisy, 15)), cmap='gray', interpolation='antialiased')
+plt.title("k=15")
 
+plt.subplot(3,2,5)
+plt.imshow(create_img(*truncate(*svd_noisy, 50)), cmap='gray', interpolation='antialiased')
+plt.title("k=50")
+
+
+plt.subplot(3,2,6)
+plt.imshow(create_img(*truncate(*svd_noisy, 200)), cmap='gray', interpolation='antialiased')
+plt.title("k=200")
+
+
+fig5 = plt.figure(figsize=(10, 8))
+
+
+error_values = []
+for i in range(1,200,2):
+    error_values.append(frobenius_norm(grey-create_img(*truncate(*svd_noisy, i)))/frobenius_norm(grey))
+
+plt.plot(error_values)
+plt.title("Error vs. k")
+plt.xlabel("k")
+plt.ylabel("Error")
+
+fig1.savefig("truncated_images.png")
+fig2.savefig("singular_values_linear.png")
+fig3.savefig("singular_values_log.png")
+fig4.savefig("noisy_image.png")
+fig5.savefig("error_plot_noisy.png")
 plt.show()
